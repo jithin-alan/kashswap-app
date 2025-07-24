@@ -6,6 +6,7 @@ import Room1Screen from '@/components/screens/room1';
 import Room2Screen from '@/components/screens/room2';
 import OfferwallScreen from '@/components/screens/offerwall';
 import PointsScreen from '@/components/screens/points';
+import { Coins } from 'lucide-react';
 
 export type Screen = 'room1' | 'room2' | 'offerwall' | 'points';
 
@@ -34,7 +35,7 @@ export default function AppShell() {
           <h1 className="text-xl font-headline font-bold text-primary">KashFlow</h1>
           <div className="flex items-center gap-2">
             <span className="font-bold text-lg text-reward">1,250</span>
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-reward"><path d="M12 2L9.1 8.5 2 9.3l5.5 5-1.3 7.2L12 18l5.8 3.5-1.3-7.2L22 9.3l-7.1-.8L12 2z"/></svg>
+            <Coins className="h-6 w-6 text-reward" />
           </div>
         </header>
         
