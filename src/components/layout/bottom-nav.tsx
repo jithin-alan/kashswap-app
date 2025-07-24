@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { Dispatch, SetStateAction } from 'react';
@@ -26,7 +27,7 @@ export default function BottomNav({ activeScreen, setActiveScreen }: BottomNavPr
           return (
             <button
               key={item.id}
-              onClick={() => setActiveScreen(item.id)}
+              onClick={() => setActiveScreen(item.id as Screen)}
               className={cn(
                 'flex flex-col items-center justify-center gap-1 text-muted-foreground w-20 h-16 rounded-lg transition-all duration-300 ease-in-out transform',
                 'hover:bg-primary/10 hover:text-primary',
