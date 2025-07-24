@@ -7,11 +7,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 
 const transactions = [
   { id: 1, description: "Survey Completion", coins: 500, date: "2024-07-20", type: "earn" },
@@ -58,18 +58,13 @@ export default function CoinsScreen() {
         title: "Withdrawal Request Submitted",
         description: `Your request for ${totalCoins.toLocaleString()} coins has been submitted.`,
       });
-      setIsOpen(false);
-      // Reset state after submission
-      setTimeout(() => {
-        setStep(1);
-        setPaymentMethod(null);
-        setPaymentId('');
-      }, 500);
+      resetDialog();
     }
   };
 
   const resetDialog = () => {
     setIsOpen(false);
+    // Use a short timeout to prevent visual glitch while dialog closes
     setTimeout(() => {
       setStep(1);
       setPaymentMethod(null);
@@ -111,34 +106,46 @@ export default function CoinsScreen() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <Dialog open={isOpen} onOpenChange={(open) => !open && resetDialog()}>
             <DialogTrigger asChild>
-              <Button className="w-full" disabled={!canWithdraw} onClick={() => setIsOpen(true)}>
+              <Button className="w-full bg-cta hover:bg-cta/90" disabled={!canWithdraw} onClick={() => setIsOpen(true)}>
                 Withdraw Request
               </Button>
             </DialogTrigger>
             <DialogContent onEscapeKeyDown={resetDialog}>
               <DialogHeader>
-                <DialogTitle>Withdrawal Request</DialogTitle>
-                <DialogDescription>
+                <DialogTitle className="font-headline text-center text-2xl">
+                   {step === 1 ? "Withdrawal Method" : "Enter Details"}
+                </DialogTitle>
+                <DialogDescription className="text-center">
                   {step === 1 
-                    ? "Select your preferred withdrawal method." 
-                    : `Enter your ${paymentMethod === 'upi' ? 'UPI ID' : 'PayPal Email'}.`}
+                    ? "Select your preferred payment method." 
+                    : `Please enter your ${paymentMethod === 'upi' ? 'UPI ID' : 'PayPal Email'}.`}
                 </DialogDescription>
               </DialogHeader>
               
-              <div className="py-4">
+              <div className="py-4 space-y-4">
                 {step === 1 && (
-                  <RadioGroup onValueChange={(value: 'upi' | 'paypal') => setPaymentMethod(value)} value={paymentMethod ?? undefined}>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="upi" id="upi" />
-                      <Label htmlFor="upi">UPI</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <RadioGroupItem value="paypal" id="paypal" />
-                      <Label htmlFor="paypal">PayPal</Label>
-                    </div>
-                  </RadioGroup>
+                  <div className="grid grid-cols-2 gap-4">
+                    <button 
+                      className={cn(
+                        "p-4 border rounded-lg text-center font-semibold transition-all duration-200",
+                        paymentMethod === 'upi' ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary hover:bg-secondary/80'
+                      )}
+                      onClick={() => setPaymentMethod('upi')}
+                    >
+                      UPI
+                    </button>
+                    <button 
+                      className={cn(
+                        "p-4 border rounded-lg text-center font-semibold transition-all duration-200",
+                        paymentMethod === 'paypal' ? 'bg-primary text-primary-foreground border-primary' : 'bg-secondary hover:bg-secondary/80'
+                      )}
+                      onClick={() => setPaymentMethod('paypal')}
+                    >
+                      PayPal
+                    </button>
+                  </div>
                 )}
                 {step === 2 && (
                   <div>
@@ -150,16 +157,17 @@ export default function CoinsScreen() {
                       value={paymentId}
                       onChange={(e) => setPaymentId(e.target.value)}
                       placeholder={paymentMethod === 'upi' ? 'yourname@bank' : 'your.email@example.com'}
+                      className="text-center text-lg h-12"
                     />
                   </div>
                 )}
               </div>
               
-              <DialogFooter>
+              <DialogFooter className="gap-2 sm:gap-0">
                 {step === 2 && (
                    <Button variant="outline" onClick={() => setStep(1)}>Back</Button>
                 )}
-                <Button onClick={handleWithdrawRequest}>
+                <Button onClick={handleWithdrawRequest} className="w-full sm:w-auto bg-cta hover:bg-cta/90">
                   {step === 1 ? 'Next' : 'Submit'}
                 </Button>
               </DialogFooter>
@@ -194,7 +202,7 @@ export default function CoinsScreen() {
                     <p className="text-xs text-muted-foreground">{tx.date}</p>
                   </TableCell>
                   <TableCell className="text-right">
-                    <Badge variant={tx.type === 'earn' ? 'default' : 'destructive'} className={tx.type === 'earn' ? 'bg-progress hover:bg-progress/90' : ''}>
+                    <Badge variant={tx.type === 'earn' ? 'default' : 'destructive'} className={cn(tx.type === 'earn' ? 'bg-progress hover:bg-progress/90' : '', 'font-mono')}>
                       {tx.type === 'earn' ? `+${tx.coins}` : tx.coins}
                     </Badge>
                   </TableCell>
