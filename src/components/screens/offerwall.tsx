@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { runFlow } from '@genkit-ai/next/client';
 import type { Offer } from '@/ai/flows/offers';
-import { getOffersFlow } from '@/ai/flows/offers';
+import { getOffers } from '@/ai/flows/offers';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -77,7 +77,7 @@ export default function OfferwallScreen() {
     const fetchOffers = async () => {
       setIsLoading(true);
       try {
-        const offersResult = await runFlow(getOffersFlow, { userId: 'user123' });
+        const offersResult = await getOffers('user123');
         setOffers(offersResult);
       } catch (error) {
         console.error('Failed to fetch offers:', error);

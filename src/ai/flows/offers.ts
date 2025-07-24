@@ -1,8 +1,15 @@
-import { flow } from 'genkit/flow';
-import { z } from 'zod';
-import { ai } from '../genkit';
 
-export const OfferSchema = z.object({
+'use server';
+/**
+ * @fileOverview A flow for retrieving personalized offers for a user.
+ *
+ * - getOffers - A function that returns a list of offers for a given user.
+ * - Offer - The type definition for an offer object.
+ */
+import {z} from 'zod';
+import {ai} from '../genkit';
+
+const OfferSchema = z.object({
   id: z.string(),
   title: z.string(),
   description: z.string(),
@@ -71,19 +78,22 @@ const mockOffers: Offer[] = [
   },
 ];
 
-export const getOffersFlow = flow(
+const getOffersFlow = ai.defineFlow(
   {
     name: 'getOffers',
-    inputSchema: z.object({ userId: z.string() }),
+    inputSchema: z.object({userId: z.string()}),
     outputSchema: z.array(OfferSchema),
-    authPolicy: (auth, input) => {},
   },
-  async ({ userId }) => {
+  async ({userId}) => {
     // In a real application, you would use the AI to personalize offers
     // based on the userId and their interaction history.
     console.log(`Generating personalized offers for user: ${userId}`);
-    
+
     // For this demonstration, we simulate personalization by simply shuffling the offers.
     return mockOffers.sort(() => Math.random() - 0.5);
   }
 );
+
+export async function getOffers(userId: string): Promise<Offer[]> {
+  return getOffersFlow({userId});
+}

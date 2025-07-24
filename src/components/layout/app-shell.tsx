@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import BottomNav, '@/components/layout/bottom-nav';
+import BottomNav from '@/components/layout/bottom-nav';
 import Room1Screen from '@/components/screens/room1';
 import Room2Screen from '@/components/screens/room2';
 import OfferwallScreen from '@/components/screens/offerwall';
