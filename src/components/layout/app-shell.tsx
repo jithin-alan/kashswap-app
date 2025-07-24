@@ -32,7 +32,7 @@ export default function AppShell() {
     <div className="min-h-screen bg-neutral-100 dark:bg-neutral-900 font-body text-foreground">
       <div className="relative mx-auto flex h-[100dvh] max-w-lg flex-col border-x border-neutral-200 dark:border-neutral-800 bg-background">
         <header className="flex items-center justify-between p-4 border-b shrink-0">
-          <h1 className="text-xl font-headline font-bold text-primary">KashFlow</h1>
+          <h1 className="text-xl font-headline font-bold text-primary">KashSwap</h1>
           <div className="flex items-center gap-2">
             <span className="font-bold text-lg text-reward">1,250</span>
             <Coins className="h-6 w-6 text-reward" />

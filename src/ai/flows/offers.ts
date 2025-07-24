@@ -69,7 +69,7 @@ const mockOffers: Offer[] = [
   },
   {
     id: '6',
-    title: 'Refer a Friend to KashFlow',
+    title: 'Refer a Friend to KashSwap',
     description: 'Invite your friends and earn coins when they sign up.',
     coins: 1500,
     imageUrl: 'https://placehold.co/600x400.png',
