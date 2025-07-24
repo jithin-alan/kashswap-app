@@ -47,7 +47,9 @@ export default function CoinsScreen() {
 
   const levelInfo = useMemo(() => {
     const currentLevelInfo = [...levels].reverse().find(l => totalCoins >= l.coins);
-    if (!currentLevelInfo) return { currentLevel: 1, progress: 0, nextLevel: 2, coinsToNextLevel: levels[1].coins };
+    if (!currentLevelInfo) {
+      return { currentLevel: 1, progress: 0, nextLevel: 2, coinsToNextLevel: levels[1].coins };
+    }
 
     const currentLevelIndex = levels.findIndex(l => l.level === currentLevelInfo.level);
     
@@ -130,12 +132,13 @@ export default function CoinsScreen() {
       
       setTransactions([newTransaction, ...transactions]);
       setTotalCoins(currentCoins => currentCoins - withdrawalAmount);
+      setIsWithdrawalPending(true);
 
       toast({
         title: "Withdrawal Request Submitted",
         description: `Your request for ${withdrawalAmount.toLocaleString()} coins will be processed within 14 days and you will be updated via your registered email address.`,
       });
-      setIsWithdrawalPending(true);
+      
       resetDialog();
     }
   };
@@ -283,7 +286,7 @@ export default function CoinsScreen() {
       <Card>
         <CardHeader>
           <CardTitle className="font-headline text-xl">Recent Activity</CardTitle>
-        </Header>
+        </CardHeader>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
@@ -312,4 +315,5 @@ export default function CoinsScreen() {
       </Card>
     </div>
   );
-}
+
+    
