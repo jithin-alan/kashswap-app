@@ -56,7 +56,7 @@ export default function CoinsScreen() {
       console.log(`Withdrawal request for ${paymentId} via ${paymentMethod}`);
       toast({
         title: "Withdrawal Request Submitted",
-        description: `Your request for ${totalCoins.toLocaleString()} coins has been submitted.`,
+        description: "Your request will be processed within 14 days and you will be updated via your registered email address.",
       });
       resetDialog();
     }
