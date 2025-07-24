@@ -28,6 +28,7 @@ export default function CoinsScreen() {
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState<'upi' | 'paypal' | null>(null);
   const [paymentId, setPaymentId] = useState('');
+  const [amount, setAmount] = useState('');
   const [isWithdrawalPending, setIsWithdrawalPending] = useState(false);
   const { toast } = useToast();
 
@@ -45,6 +46,25 @@ export default function CoinsScreen() {
         });
       }
     } else if (step === 2) {
+      const withdrawalAmount = parseInt(amount, 10);
+      if (isNaN(withdrawalAmount) || withdrawalAmount <= 0) {
+        toast({
+          title: "Invalid Amount",
+          description: "Please enter a valid number of coins to withdraw.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (withdrawalAmount > totalCoins) {
+        toast({
+          title: "Insufficient Balance",
+          description: "You cannot withdraw more coins than you have.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       if (paymentId.trim() === '') {
         toast({
           title: "Input Required",
@@ -53,11 +73,11 @@ export default function CoinsScreen() {
         });
         return;
       }
-      // Handle submission logic here
-      console.log(`Withdrawal request for ${paymentId} via ${paymentMethod}`);
+      
+      console.log(`Withdrawal request for ${withdrawalAmount} coins to ${paymentId} via ${paymentMethod}`);
       toast({
         title: "Withdrawal Request Submitted",
-        description: "Your request will be processed within 14 days and you will be updated via your registered email address.",
+        description: `Your request for ${withdrawalAmount.toLocaleString()} coins will be processed within 14 days and you will be updated via your registered email address.`,
       });
       setIsWithdrawalPending(true);
       resetDialog();
@@ -71,6 +91,7 @@ export default function CoinsScreen() {
       setStep(1);
       setPaymentMethod(null);
       setPaymentId('');
+      setAmount('');
     }, 300);
   }
 
@@ -122,7 +143,7 @@ export default function CoinsScreen() {
                 <DialogDescription className="text-center">
                   {step === 1 
                     ? "Select your preferred payment method." 
-                    : `Please enter your ${paymentMethod === 'upi' ? 'UPI ID' : 'PayPal Email'}.`}
+                    : `Enter the amount and your ${paymentMethod === 'upi' ? 'UPI ID' : 'PayPal Email'}.`}
                 </DialogDescription>
               </DialogHeader>
               
@@ -150,17 +171,30 @@ export default function CoinsScreen() {
                   </div>
                 )}
                 {step === 2 && (
-                  <div>
-                    <Label htmlFor="paymentId" className="sr-only">
-                      {paymentMethod === 'upi' ? 'UPI ID' : 'PayPal Email'}
-                    </Label>
-                    <Input 
-                      id="paymentId"
-                      value={paymentId}
-                      onChange={(e) => setPaymentId(e.target.value)}
-                      placeholder={paymentMethod === 'upi' ? 'yourname@bank' : 'your.email@example.com'}
-                      className="text-center text-lg h-12"
-                    />
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="amount">Amount</Label>
+                      <Input 
+                        id="amount"
+                        type="number"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        placeholder="e.g., 5000"
+                        className="text-lg h-12"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="paymentId">
+                        {paymentMethod === 'upi' ? 'UPI ID' : 'PayPal Email'}
+                      </Label>
+                      <Input 
+                        id="paymentId"
+                        value={paymentId}
+                        onChange={(e) => setPaymentId(e.target.value)}
+                        placeholder={paymentMethod === 'upi' ? 'yourname@bank' : 'your.email@example.com'}
+                        className="text-lg h-12"
+                      />
+                    </div>
                   </div>
                 )}
               </div>
@@ -216,4 +250,5 @@ export default function CoinsScreen() {
       </Card>
     </div>
   );
-}
+
+    
