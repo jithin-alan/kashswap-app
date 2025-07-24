@@ -29,17 +29,17 @@ export default function AppShell() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-100 dark:bg-neutral-900 font-body text-foreground">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 font-body text-foreground">
       <div className="relative mx-auto flex h-[100dvh] max-w-lg flex-col border-x border-neutral-200 dark:border-neutral-800 bg-background">
-        <header className="flex items-center justify-between p-4 border-b shrink-0">
-          <h1 className="text-xl font-headline font-bold text-primary">KashSwap</h1>
-          <div className="flex items-center gap-2">
+        <header className="flex items-center justify-between p-4 border-b shrink-0 bg-card/80 backdrop-blur-lg">
+          <h1 className="text-2xl font-headline font-bold text-primary">KashSwap</h1>
+          <div className="flex items-center gap-2 rounded-full bg-secondary px-3 py-1">
             <span className="font-bold text-lg text-reward">1,250</span>
             <Coins className="h-6 w-6 text-reward" />
           </div>
         </header>
         
-        <main key={activeScreen} className="flex-1 overflow-y-auto pb-20 animate-in fade-in-25 duration-300">
+        <main key={activeScreen} className="flex-1 overflow-y-auto pb-24 bg-secondary/30">
           {renderScreen()}
         </main>
 

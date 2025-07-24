@@ -12,7 +12,6 @@ export default {
       fontFamily: {
         body: ['PT Sans', 'sans-serif'],
         headline: ['Poppins', 'sans-serif'],
-        code: ['monospace'],
       },
       colors: {
         background: 'hsl(var(--background))',
@@ -55,10 +54,10 @@ export default {
           '4': 'hsl(var(--chart-4))',
           '5': 'hsl(var(--chart-5))',
         },
-        reward: 'hsl(47 96% 52%)',
-        warmth: 'hsl(351 95% 71%)',
-        cta: 'hsl(22 92% 51%)',
-        progress: 'hsl(160 84% 39%)',
+        reward: 'hsl(44 96% 52%)', /* Golden Yellow */
+        warmth: 'hsl(351 95% 71%)', /* Coral Pink */
+        cta: 'hsl(22 92% 51%)', /* Vibrant Orange */
+        progress: 'hsl(145 84% 39%)', /* Emerald Green */
       },
       borderRadius: {
         lg: 'var(--radius)',
