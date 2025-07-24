@@ -65,6 +65,15 @@ export default function CoinsScreen() {
         return;
       }
 
+      if (withdrawalAmount < withdrawalThreshold) {
+        toast({
+          title: "Minimum Withdrawal Amount",
+          description: `You must withdraw at least ${withdrawalThreshold.toLocaleString()} coins.`,
+          variant: "destructive",
+        });
+        return;
+      }
+
       if (paymentId.trim() === '') {
         toast({
           title: "Input Required",
@@ -173,13 +182,13 @@ export default function CoinsScreen() {
                 {step === 2 && (
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="amount">Amount</Label>
+                      <Label htmlFor="amount">Amount (Coins)</Label>
                       <Input 
                         id="amount"
                         type="number"
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
-                        placeholder="e.g., 5000"
+                        placeholder="e.g., 100000"
                         className="text-lg h-12"
                       />
                     </div>
