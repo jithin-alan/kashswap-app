@@ -31,7 +31,7 @@ export default function CoinsScreen() {
   const [isWithdrawalPending, setIsWithdrawalPending] = useState(false);
   const { toast } = useToast();
   
-  const [totalCoins, setTotalCoins] = useState(125000);
+  const [totalCoins, setTotalCoins] = useState(1000000);
   const [transactions, setTransactions] = useState(initialTransactions);
 
   const canWithdraw = totalCoins >= withdrawalThreshold;
@@ -274,4 +274,5 @@ export default function CoinsScreen() {
     </div>
   );
 
+    
     

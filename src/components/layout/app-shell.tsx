@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -39,7 +40,7 @@ export default function AppShell() {
         <header className="flex items-center justify-between p-4 border-b shrink-0 bg-card/80 backdrop-blur-lg">
           <h1 className="text-2xl font-headline font-bold text-primary">KashSwap</h1>
           <div className="flex items-center gap-2 rounded-full bg-secondary px-3 py-1">
-            <span className="font-bold text-lg text-reward">1,250</span>
+            <span className="font-bold text-lg text-reward">1,000,000</span>
             <Coins className="h-6 w-6 text-reward" />
           </div>
         </header>
@@ -53,3 +54,5 @@ export default function AppShell() {
     </div>
   );
 }
+
+    
