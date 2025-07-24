@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { runFlow } from '@genkit-ai/next/client';
 import type { Offer } from '@/ai/flows/offers';
 import { getOffers } from '@/ai/flows/offers';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -33,8 +32,8 @@ function OfferCard({ offer }: { offer: Offer }) {
       </CardHeader>
       <CardFooter className="flex justify-between items-center bg-secondary/50 p-4">
         <div className="font-bold text-lg text-reward flex items-center gap-1">
-          <span>{offer.points}</span>
-          <span className="text-sm">pts</span>
+          <span>{offer.coins}</span>
+          <span className="text-sm">coins</span>
         </div>
         <Button 
           className="bg-cta hover:bg-cta/90 text-white"

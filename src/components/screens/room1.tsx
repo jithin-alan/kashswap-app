@@ -25,7 +25,7 @@ export default function Room1Screen() {
             </CardTitle>
         </CardHeader>
         <CardContent>
-            <p>Complete surveys from CPX Research and earn points!</p>
+            <p>Complete surveys from CPX Research and earn coins!</p>
         </CardContent>
       </Card>
     </div>

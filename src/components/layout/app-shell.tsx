@@ -5,10 +5,10 @@ import BottomNav from '@/components/layout/bottom-nav';
 import Room1Screen from '@/components/screens/room1';
 import Room2Screen from '@/components/screens/room2';
 import OfferwallScreen from '@/components/screens/offerwall';
-import PointsScreen from '@/components/screens/points';
+import CoinsScreen from '@/components/screens/coins';
 import { Coins } from 'lucide-react';
 
-export type Screen = 'room1' | 'room2' | 'offerwall' | 'points';
+export type Screen = 'room1' | 'room2' | 'offerwall' | 'coins';
 
 export default function AppShell() {
   const [activeScreen, setActiveScreen] = useState<Screen>('offerwall');
@@ -21,8 +21,8 @@ export default function AppShell() {
         return <Room2Screen />;
       case 'offerwall':
         return <OfferwallScreen />;
-      case 'points':
-        return <PointsScreen />;
+      case 'coins':
+        return <CoinsScreen />;
       default:
         return <OfferwallScreen />;
     }
