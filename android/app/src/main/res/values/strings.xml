@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">kashswap</string>
+    <string name="title_activity_main">kashswap</string>
+    <string name="package_name">com.globaldev.kashsnap</string>
+    <string name="custom_url_scheme">com.globaldev.kashsnap</string>
+</resources>
