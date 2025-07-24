@@ -1,7 +1,7 @@
 'use client';
 
 import { initializeApp } from 'firebase/app';
-import { isPlatform } from '@capacitor/core';
+import { Capacitor } from '@capacitor/core';
 import {
   PushNotifications,
   Token,
@@ -20,7 +20,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export const initPushNotifications = async () => {
-  if (!isPlatform('capacitor')) {
+  if (!Capacitor.isNativePlatform()) {
     console.log('Push notifications not available on web.');
     return;
   }
