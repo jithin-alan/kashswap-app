@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -22,6 +22,15 @@ const initialTransactions = [
 
 const withdrawalThreshold = 100000;
 
+const levels = [
+    { level: 1, coins: 0 },
+    { level: 2, coins: 10000 },
+    { level: 3, coins: 50000 },
+    { level: 4, coins: 250000 },
+    { level: 5, coins: 1000000 },
+    { level: 6, coins: 5000000 },
+];
+
 export default function CoinsScreen() {
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState(1);
@@ -35,6 +44,30 @@ export default function CoinsScreen() {
   const [transactions, setTransactions] = useState(initialTransactions);
 
   const canWithdraw = totalCoins >= withdrawalThreshold;
+
+  const levelInfo = useMemo(() => {
+    const currentLevelInfo = [...levels].reverse().find(l => totalCoins >= l.coins);
+    if (!currentLevelInfo) return { currentLevel: 1, progress: 0, nextLevel: 2, coinsToNextLevel: levels[1].coins };
+
+    const currentLevelIndex = levels.findIndex(l => l.level === currentLevelInfo.level);
+    
+    if (currentLevelIndex >= levels.length - 1) {
+        return { currentLevel: currentLevelInfo.level, progress: 100, nextLevel: null, coinsToNextLevel: 0 };
+    }
+
+    const nextLevelInfo = levels[currentLevelIndex + 1];
+    const coinsInCurrentLevel = totalCoins - currentLevelInfo.coins;
+    const coinsForNextLevel = nextLevelInfo.coins - currentLevelInfo.coins;
+    const progress = Math.min(Math.floor((coinsInCurrentLevel / coinsForNextLevel) * 100), 100);
+    const coinsToNextLevel = nextLevelInfo.coins - totalCoins;
+
+    return {
+        currentLevel: currentLevelInfo.level,
+        progress,
+        nextLevel: nextLevelInfo.level,
+        coinsToNextLevel
+    };
+  }, [totalCoins]);
 
   const handleWithdrawRequest = () => {
     if (step === 1) {
@@ -134,13 +167,19 @@ export default function CoinsScreen() {
       
       <Card>
         <CardHeader>
-          <CardTitle className="font-headline text-xl">Next Level</CardTitle>
+          <CardTitle className="font-headline text-xl">Level {levelInfo.currentLevel}</CardTitle>
         </CardHeader>
         <CardContent>
-          <Progress value={50} className="h-3 [&>div]:bg-progress" />
-          <p className="text-sm text-muted-foreground mt-2 text-center">
-            You are <span className="font-bold text-foreground">1,250</span> coins away from reaching Level 5!
-          </p>
+          <Progress value={levelInfo.progress} className="h-3 [&>div]:bg-progress" />
+           {levelInfo.nextLevel ? (
+            <p className="text-sm text-muted-foreground mt-2 text-center">
+              You are <span className="font-bold text-foreground">{levelInfo.coinsToNextLevel.toLocaleString()}</span> coins away from Level {levelInfo.nextLevel}!
+            </p>
+          ) : (
+            <p className="text-sm text-muted-foreground mt-2 text-center font-semibold">
+              You have reached the maximum level!
+            </p>
+          )}
         </CardContent>
       </Card>
 
@@ -244,7 +283,7 @@ export default function CoinsScreen() {
       <Card>
         <CardHeader>
           <CardTitle className="font-headline text-xl">Recent Activity</CardTitle>
-        </CardHeader>
+        </Header>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
@@ -273,6 +312,4 @@ export default function CoinsScreen() {
       </Card>
     </div>
   );
-
-    
-    
+}
