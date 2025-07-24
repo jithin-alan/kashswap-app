@@ -1,7 +1,7 @@
 'use client';
 
 import type { Dispatch, SetStateAction } from 'react';
-import { Gift, LayoutGrid, Layers, Star } from 'lucide-react';
+import { Gift, LayoutGrid, Layers, Coins } from 'lucide-react';
 import type { Screen } from './app-shell';
 import { cn } from '@/lib/utils';
 
@@ -14,7 +14,7 @@ const navItems = [
   { id: 'room1', label: 'Room 1', icon: LayoutGrid },
   { id: 'room2', label: 'Room 2', icon: Layers },
   { id: 'offerwall', label: 'Offers', icon: Gift },
-  { id: 'points', label: 'Points', icon: Star },
+  { id: 'points', label: 'Points', icon: Coins },
 ] as const;
 
 export default function BottomNav({ activeScreen, setActiveScreen }: BottomNavProps) {
