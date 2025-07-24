@@ -28,6 +28,7 @@ export default function CoinsScreen() {
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState<'upi' | 'paypal' | null>(null);
   const [paymentId, setPaymentId] = useState('');
+  const [isWithdrawalPending, setIsWithdrawalPending] = useState(false);
   const { toast } = useToast();
 
   const canWithdraw = totalCoins >= withdrawalThreshold;
@@ -58,6 +59,7 @@ export default function CoinsScreen() {
         title: "Withdrawal Request Submitted",
         description: "Your request will be processed within 14 days and you will be updated via your registered email address.",
       });
+      setIsWithdrawalPending(true);
       resetDialog();
     }
   };
@@ -108,8 +110,8 @@ export default function CoinsScreen() {
         <CardContent>
           <Dialog open={isOpen} onOpenChange={(open) => !open && resetDialog()}>
             <DialogTrigger asChild>
-              <Button className="w-full bg-cta hover:bg-cta/90" disabled={!canWithdraw} onClick={() => setIsOpen(true)}>
-                Withdraw Request
+              <Button className="w-full bg-cta hover:bg-cta/90" disabled={!canWithdraw || isWithdrawalPending} onClick={() => setIsOpen(true)}>
+                {isWithdrawalPending ? 'Request Pending' : 'Withdraw Request'}
               </Button>
             </DialogTrigger>
             <DialogContent onEscapeKeyDown={resetDialog}>
