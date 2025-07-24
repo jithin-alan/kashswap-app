@@ -1,17 +1,22 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import BottomNav from '@/components/layout/bottom-nav';
 import Room1Screen from '@/components/screens/room1';
 import Room2Screen from '@/components/screens/room2';
 import OfferwallScreen from '@/components/screens/offerwall';
 import CoinsScreen from '@/components/screens/coins';
 import { Coins } from 'lucide-react';
+import { initPushNotifications } from '@/lib/firebase';
 
 export type Screen = 'room1' | 'room2' | 'offerwall' | 'coins';
 
 export default function AppShell() {
   const [activeScreen, setActiveScreen] = useState<Screen>('offerwall');
+
+  useEffect(() => {
+    initPushNotifications().catch(err => console.error("Error initializing push notifications", err));
+  }, []);
 
   const renderScreen = () => {
     switch (activeScreen) {
