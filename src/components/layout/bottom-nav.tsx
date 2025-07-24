@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 
 interface BottomNavProps {
   activeScreen: Screen;
-  setActiveScreen: Dispatch<SetStateAction<Screen>>;
+  setActiveScreen: (screen: Screen) => void;
 }
 
 const navItems = [
