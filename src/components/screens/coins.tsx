@@ -46,9 +46,12 @@ export default function CoinsScreen() {
   const canWithdraw = totalCoins >= withdrawalThreshold;
 
   const levelInfo = useMemo(() => {
-    const currentLevelInfo = [...levels].reverse().find(l => totalCoins >= l.coins);
-    if (!currentLevelInfo) {
-      return { currentLevel: 1, progress: 0, nextLevel: 2, coinsToNextLevel: levels[1].coins };
+    let currentLevelInfo = levels[0];
+    for (let i = levels.length - 1; i >= 0; i--) {
+        if (totalCoins >= levels[i].coins) {
+            currentLevelInfo = levels[i];
+            break;
+        }
     }
 
     const currentLevelIndex = levels.findIndex(l => l.level === currentLevelInfo.level);
@@ -114,7 +117,7 @@ export default function CoinsScreen() {
       if (paymentId.trim() === '') {
         toast({
           title: "Input Required",
-          description: `Please enter your ${paymentMethod === 'upi' ? 'UPI ID' : 'PayPal email'}.`,
+          description: `Please enter your ${paymentMethod === 'upi' ? 'UPI ID' : 'PayPal Email'}.`,
           variant: "destructive",
         });
         return;
@@ -315,5 +318,4 @@ export default function CoinsScreen() {
       </Card>
     </div>
   );
-
-    
+}
