@@ -2,7 +2,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { AdMob, AdOptions, RewardAdOptions, RewardAdPluginEvents } from '@capacitor-community/admob';
+import { AdMob, RewardAdOptions, RewardAdPluginEvents } from '@capacitor-community/admob';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -10,9 +10,13 @@ import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { Capacitor } from '@capacitor/core';
 
+interface RewardedAdCardProps {
+  addCoins: (amount: number, description: string) => void;
+}
+
 const adUnitId = 'ca-app-pub-2164351463758055/5603368742';
 
-export default function RewardedAdCard() {
+export default function RewardedAdCard({ addCoins }: RewardedAdCardProps) {
   const [isAdLoading, setIsAdLoading] = useState(false);
   const [isAdReady, setIsAdReady] = useState(false);
   const { toast } = useToast();
@@ -89,6 +93,7 @@ export default function RewardedAdCard() {
             }),
             AdMob.addListener(RewardAdPluginEvents.Rewarded, (reward) => {
                 console.log('Reward info:', reward);
+                addCoins(reward.amount, 'Video Ad Watched');
                 toast({
                     title: 'Reward Granted!',
                     description: `You earned ${reward.amount} ${reward.type}!`,

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -10,6 +11,10 @@ import Image from 'next/image';
 import { Badge } from '../ui/badge';
 import { useToast } from '@/hooks/use-toast';
 import RewardedAdCard from '../ads/rewarded-ad-card';
+
+interface OfferwallScreenProps {
+  addCoins: (amount: number, description: string) => void;
+}
 
 function OfferCard({ offer }: { offer: Offer }) {
   const { toast } = useToast();
@@ -69,7 +74,7 @@ function OfferSkeleton() {
   );
 }
 
-export default function OfferwallScreen() {
+export default function OfferwallScreen({ addCoins }: OfferwallScreenProps) {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -100,7 +105,7 @@ export default function OfferwallScreen() {
       )}
       {!isLoading && (
         <>
-          <RewardedAdCard />
+          <RewardedAdCard addCoins={addCoins} />
           {offers.map((offer) => <OfferCard key={offer.id} offer={offer} />)}
         </>
       )}

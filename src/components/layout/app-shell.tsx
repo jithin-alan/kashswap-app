@@ -6,7 +6,7 @@ import BottomNav from '@/components/layout/bottom-nav';
 import Room1Screen from '@/components/screens/room1';
 import Room2Screen from '@/components/screens/room2';
 import OfferwallScreen from '@/components/screens/offerwall';
-import CoinsScreen from '@/components/screens/coins';
+import CoinsScreen, { Transaction } from '@/components/screens/coins';
 import SettingsScreen from '@/components/screens/settings';
 import { Coins, Settings } from 'lucide-react';
 import { initPushNotifications } from '@/lib/firebase';
@@ -14,13 +14,34 @@ import { Button } from '@/components/ui/button';
 
 export type Screen = 'room1' | 'room2' | 'offerwall' | 'coins' | 'settings';
 
+const initialTransactions: Transaction[] = [
+  { id: '1', description: "Survey Completion", coins: 500, date: "2024-07-20", type: "earn" },
+  { id: '2', description: "Video Ad Watched", coins: 100, date: "2024-07-20", type: "earn" },
+  { id: '3', description: "Redeemed Gift Card", coins: -1000, date: "2024-07-19", type: "redeem" },
+  { id: '4', description: "Daily Login Bonus", coins: 50, date: "2024-07-19", type: "earn" },
+];
+
 export default function AppShell() {
   const [activeScreen, setActiveScreen] = useState<Screen>('offerwall');
   const [previousScreen, setPreviousScreen] = useState<Screen | null>(null);
+  const [totalCoins, setTotalCoins] = useState(1000000);
+  const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
 
   useEffect(() => {
     initPushNotifications().catch(err => console.error("Error initializing push notifications", err));
   }, []);
+  
+  const addCoins = (amount: number, description: string) => {
+    const newTransaction: Transaction = {
+      id: (transactions.length + 1).toString(),
+      description,
+      coins: amount,
+      date: new Date().toISOString().split('T')[0],
+      type: amount > 0 ? 'earn' : 'redeem',
+    };
+    setTotalCoins(prev => prev + amount);
+    setTransactions(prev => [newTransaction, ...prev]);
+  };
 
   const navigateTo = (screen: Screen) => {
     if (screen !== activeScreen) {
@@ -53,13 +74,13 @@ export default function AppShell() {
       case 'room2':
         return <Room2Screen />;
       case 'offerwall':
-        return <OfferwallScreen />;
+        return <OfferwallScreen addCoins={addCoins} />;
       case 'coins':
-        return <CoinsScreen />;
+        return <CoinsScreen totalCoins={totalCoins} transactions={transactions} addCoins={addCoins} />;
       case 'settings':
         return <SettingsScreen />;
       default:
-        return <OfferwallScreen />;
+        return <OfferwallScreen addCoins={addCoins} />;
     }
   };
 
@@ -74,7 +95,7 @@ export default function AppShell() {
           <div className="flex items-center gap-2">
             {!isSettingsActive && (
               <div className="flex items-center gap-2 rounded-full bg-secondary px-3 py-1">
-                <span className="font-bold text-lg text-reward">1,000,000</span>
+                <span className="font-bold text-lg text-reward">{totalCoins.toLocaleString()}</span>
                 <Coins className="h-6 w-6 text-reward" />
               </div>
             )}

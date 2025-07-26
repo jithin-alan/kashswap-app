@@ -13,12 +13,19 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
 
-const initialTransactions = [
-  { id: 1, description: "Survey Completion", coins: 500, date: "2024-07-20", type: "earn" },
-  { id: 2, description: "Video Ad Watched", coins: 100, date: "2024-07-20", type: "earn" },
-  { id: 3, description: "Redeemed Gift Card", coins: -1000, date: "2024-07-19", type: "redeem" },
-  { id: 4, "description": "Daily Login Bonus", "coins": 50, "date": "2024-07-19", type: "earn" },
-];
+export interface Transaction {
+  id: string;
+  description: string;
+  coins: number;
+  date: string;
+  type: 'earn' | 'redeem';
+}
+
+interface CoinsScreenProps {
+  totalCoins: number;
+  transactions: Transaction[];
+  addCoins: (amount: number, description: string) => void;
+}
 
 const withdrawalThreshold = 100000;
 
@@ -31,7 +38,7 @@ const levels = [
     { level: 6, coins: 5000000 },
 ];
 
-export default function CoinsScreen() {
+export default function CoinsScreen({ totalCoins, transactions, addCoins }: CoinsScreenProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState<'upi' | 'paypal' | null>(null);
@@ -40,9 +47,6 @@ export default function CoinsScreen() {
   const [isWithdrawalPending, setIsWithdrawalPending] = useState(false);
   const { toast } = useToast();
   
-  const [totalCoins, setTotalCoins] = useState(1000000);
-  const [transactions, setTransactions] = useState(initialTransactions);
-
   const canWithdraw = totalCoins >= withdrawalThreshold;
 
   const levelInfo = useMemo(() => {
@@ -125,16 +129,7 @@ export default function CoinsScreen() {
       
       console.log(`Withdrawal request for ${withdrawalAmount} coins to ${paymentId} via ${paymentMethod}`);
       
-      const newTransaction = {
-        id: transactions.length + 1,
-        description: `Withdrawal via ${paymentMethod}`,
-        coins: -withdrawalAmount,
-        date: new Date().toISOString().split('T')[0],
-        type: 'redeem' as const
-      };
-      
-      setTransactions([newTransaction, ...transactions]);
-      setTotalCoins(currentCoins => currentCoins - withdrawalAmount);
+      addCoins(-withdrawalAmount, `Withdrawal via ${paymentMethod}`);
       setIsWithdrawalPending(true);
 
       toast({
