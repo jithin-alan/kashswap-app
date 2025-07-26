@@ -9,6 +9,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
 import { Badge } from '../ui/badge';
 import { useToast } from '@/hooks/use-toast';
+import RewardedAdCard from '../ads/rewarded-ad-card';
 
 function OfferCard({ offer }: { offer: Offer }) {
   const { toast } = useToast();
@@ -76,7 +77,8 @@ export default function OfferwallScreen() {
     const fetchOffers = async () => {
       setIsLoading(true);
       try {
-        const offersResult = await getOffers('user123');
+        // We will remove one mock offer to make space for the ad card
+        const offersResult = await getOffers('user123').slice(1);
         setOffers(offersResult);
       } catch (error) {
         console.error('Failed to fetch offers:', error);
@@ -96,7 +98,12 @@ export default function OfferwallScreen() {
           <OfferSkeleton />
         </>
       )}
-      {!isLoading && offers.map((offer) => <OfferCard key={offer.id} offer={offer} />)}
+      {!isLoading && (
+        <>
+          <RewardedAdCard />
+          {offers.map((offer) => <OfferCard key={offer.id} offer={offer} />)}
+        </>
+      )}
     </div>
   );
 }
