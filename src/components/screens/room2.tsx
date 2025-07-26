@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Beaker, BrainCircuit } from "lucide-react";
+import { Beaker, Sparkles } from "lucide-react";
 
 export default function Room2Screen() {
   return (
@@ -17,16 +17,12 @@ export default function Room2Screen() {
           <h3 className="text-lg font-semibold font-headline">Experiments</h3>
           <p className="text-sm text-muted-foreground">Try out new and exciting things.</p>
       </Card>
-      <Card data-testid="inbrain-ai">
-        <CardHeader>
-            <CardTitle className="font-headline flex items-center gap-2">
-                <BrainCircuit className="w-6 h-6" />
-                <span>InBrain.ai</span>
-            </CardTitle>
-        </CardHeader>
-        <CardContent>
-            <p>Answer surveys from InBrain.ai and get rewarded.</p>
-        </CardContent>
+      <Card className="flex flex-col items-center justify-center p-8 text-center bg-secondary/50 border-dashed">
+        <Sparkles className="w-16 h-16 mb-4 text-muted-foreground" />
+        <h3 className="text-lg font-semibold font-headline">More Surveys Coming Soon!</h3>
+        <p className="text-sm text-muted-foreground mt-2 max-w-xs">
+            New ways to earn are just around the corner. We're busy setting things up for you!
+        </p>
       </Card>
     </div>
   );
