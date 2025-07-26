@@ -1,11 +1,13 @@
 'use client';
 
 import { initializeApp } from 'firebase/app';
+import { getFirestore } from "firebase/firestore";
 import { Capacitor } from '@capacitor/core';
 import {
   PushNotifications,
   Token,
 } from '@capacitor/push-notifications';
+import { updateUserProfile } from './firestore';
 
 const firebaseConfig = {
   "projectId": "kashflow-1ik2o",
@@ -18,6 +20,10 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);
+
+// SIMULATED USER ID - In a real app, this would come from your auth system
+const MOCK_USER_ID = 'user123'; 
 
 export const initPushNotifications = async () => {
   if (!Capacitor.isNativePlatform()) {
@@ -42,7 +48,10 @@ export const initPushNotifications = async () => {
   // On success, we should be able to receive notifications
   PushNotifications.addListener('registration', (token: Token) => {
     console.info('FCM token:', token.value);
-    // In a real app, you would send this to your server
+    // Save the FCM token to the user's profile in Firestore
+    updateUserProfile(MOCK_USER_ID, { fcmToken: token.value })
+      .then(() => console.log("Successfully saved FCM token to Firestore."))
+      .catch(err => console.error("Failed to save FCM token:", err));
   });
 
   // Some issue with our setup and push will not work

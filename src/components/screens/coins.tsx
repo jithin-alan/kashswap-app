@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import { createWithdrawalRequest } from "@/lib/firestore";
 
 export interface Transaction {
   id: string;
@@ -25,6 +26,7 @@ interface CoinsScreenProps {
   totalCoins: number;
   transactions: Transaction[];
   addCoins: (amount: number, description: string) => void;
+  userId: string;
 }
 
 const withdrawalThreshold = 100000;
@@ -38,7 +40,7 @@ const levels = [
     { level: 6, coins: 5000000 },
 ];
 
-export default function CoinsScreen({ totalCoins, transactions, addCoins }: CoinsScreenProps) {
+export default function CoinsScreen({ totalCoins, transactions, addCoins, userId }: CoinsScreenProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState<'upi' | 'paypal' | null>(null);
@@ -78,7 +80,7 @@ export default function CoinsScreen({ totalCoins, transactions, addCoins }: Coin
     };
   }, [totalCoins]);
 
-  const handleWithdrawRequest = () => {
+  const handleWithdrawRequest = async () => {
     if (step === 1) {
       if (paymentMethod) {
         setStep(2);
@@ -118,7 +120,7 @@ export default function CoinsScreen({ totalCoins, transactions, addCoins }: Coin
         return;
       }
 
-      if (paymentId.trim() === '') {
+      if (!paymentMethod || paymentId.trim() === '') {
         toast({
           title: "Input Required",
           description: `Please enter your ${paymentMethod === 'upi' ? 'UPI ID' : 'PayPal Email'}.`,
@@ -129,15 +131,31 @@ export default function CoinsScreen({ totalCoins, transactions, addCoins }: Coin
       
       console.log(`Withdrawal request for ${withdrawalAmount} coins to ${paymentId} via ${paymentMethod}`);
       
-      addCoins(-withdrawalAmount, `Withdrawal via ${paymentMethod}`);
-      setIsWithdrawalPending(true);
+      try {
+        await createWithdrawalRequest({
+          userId,
+          amount: withdrawalAmount,
+          paymentMethod,
+          paymentId,
+        });
 
-      toast({
-        title: "Withdrawal Request Submitted",
-        description: `Your request for ${withdrawalAmount.toLocaleString()} coins will be processed within 14 days and you will be updated via your registered email address.`,
-      });
-      
-      resetDialog();
+        addCoins(-withdrawalAmount, `Withdrawal via ${paymentMethod}`);
+        setIsWithdrawalPending(true);
+
+        toast({
+          title: "Withdrawal Request Submitted",
+          description: `Your request for ${withdrawalAmount.toLocaleString()} coins will be processed within 14 days and you will be updated via your registered email address.`,
+        });
+        
+        resetDialog();
+      } catch (error) {
+        console.error("Failed to submit withdrawal request:", error);
+        toast({
+          title: "Request Failed",
+          description: "Could not submit your withdrawal request. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
   };
 

@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import BottomNav from '@/components/layout/bottom-nav';
 import Room1Screen from '@/components/screens/room1';
 import Room2Screen from '@/components/screens/room2';
@@ -11,8 +11,12 @@ import SettingsScreen from '@/components/screens/settings';
 import { Coins, Settings } from 'lucide-react';
 import { initPushNotifications } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
+import { getUserProfile, updateUserCoins } from '@/lib/firestore';
 
 export type Screen = 'room1' | 'room2' | 'offerwall' | 'coins' | 'settings';
+
+// SIMULATED USER ID - In a real app, this would come from your auth system
+const MOCK_USER_ID = 'user123';
 
 const initialTransactions: Transaction[] = [
   { id: '1', description: "Survey Completion", coins: 500, date: "2024-07-20", type: "earn" },
@@ -24,14 +28,24 @@ const initialTransactions: Transaction[] = [
 export default function AppShell() {
   const [activeScreen, setActiveScreen] = useState<Screen>('offerwall');
   const [previousScreen, setPreviousScreen] = useState<Screen | null>(null);
-  const [totalCoins, setTotalCoins] = useState(1000000);
+  const [totalCoins, setTotalCoins] = useState(0);
   const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
+  const [isLoading, setIsLoading] = useState(true);
 
+  // Fetch initial user data from Firestore
   useEffect(() => {
     initPushNotifications().catch(err => console.error("Error initializing push notifications", err));
+    
+    getUserProfile(MOCK_USER_ID).then(profile => {
+      setTotalCoins(profile.totalCoins);
+      setIsLoading(false);
+    }).catch(err => {
+      console.error("Failed to fetch user profile:", err);
+      setIsLoading(false);
+    });
   }, []);
-  
-  const addCoins = (amount: number, description: string) => {
+
+  const addCoins = useCallback((amount: number, description: string) => {
     const newTransaction: Transaction = {
       id: (transactions.length + 1).toString(),
       description,
@@ -39,9 +53,17 @@ export default function AppShell() {
       date: new Date().toISOString().split('T')[0],
       type: amount > 0 ? 'earn' : 'redeem',
     };
-    setTotalCoins(prev => prev + amount);
+    
+    const newTotal = totalCoins + amount;
+    setTotalCoins(newTotal);
     setTransactions(prev => [newTransaction, ...prev]);
-  };
+
+    // Update Firestore
+    updateUserCoins(MOCK_USER_ID, newTotal).catch(err => {
+        console.error("Failed to update coins in Firestore:", err);
+        // Optionally revert state on failure
+    });
+  }, [totalCoins, transactions]);
 
   const navigateTo = (screen: Screen) => {
     if (screen !== activeScreen) {
@@ -68,6 +90,14 @@ export default function AppShell() {
   };
 
   const renderScreen = () => {
+    if (isLoading) {
+      return (
+        <div className="flex justify-center items-center h-full">
+          <p>Loading Your Profile...</p>
+        </div>
+      );
+    }
+    
     switch (activeScreen) {
       case 'room1':
         return <Room1Screen />;
@@ -76,7 +106,7 @@ export default function AppShell() {
       case 'offerwall':
         return <OfferwallScreen addCoins={addCoins} />;
       case 'coins':
-        return <CoinsScreen totalCoins={totalCoins} transactions={transactions} addCoins={addCoins} />;
+        return <CoinsScreen totalCoins={totalCoins} transactions={transactions} addCoins={addCoins} userId={MOCK_USER_ID} />;
       case 'settings':
         return <SettingsScreen />;
       default:
