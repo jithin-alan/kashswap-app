@@ -15,9 +15,6 @@ import { getUserProfile, updateUserCoins } from '@/lib/firestore';
 
 export type Screen = 'room1' | 'room2' | 'offerwall' | 'coins' | 'settings';
 
-// SIMULATED USER ID - In a real app, this would come from your auth system
-const MOCK_USER_ID = 'user123';
-
 const initialTransactions: Transaction[] = [];
 
 export default function AppShell() {
@@ -26,29 +23,38 @@ export default function AppShell() {
   const [totalCoins, setTotalCoins] = useState(0);
   const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
   const [isLoading, setIsLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
 
-  // Fetch initial user data from Firestore
+  // Get or create a unique user ID for the device
   useEffect(() => {
-    initPushNotifications().catch(err => console.error("Error initializing push notifications", err));
+    let storedUserId = localStorage.getItem('kashswap_user_id');
+    if (!storedUserId) {
+      storedUserId = crypto.randomUUID();
+      localStorage.setItem('kashswap_user_id', storedUserId);
+    }
+    setUserId(storedUserId);
+  }, []);
+
+  // Fetch initial user data from Firestore once userId is available
+  useEffect(() => {
+    if (!userId) return;
+
+    initPushNotifications(userId).catch(err => console.error("Error initializing push notifications", err));
     
-    getUserProfile(MOCK_USER_ID).then(profile => {
-      // FOR TESTING: Reset coins to 0 on load if they exist.
-      if (profile.totalCoins > 0) {
-        updateUserCoins(MOCK_USER_ID, 0);
-        setTotalCoins(0);
-      } else {
-        setTotalCoins(profile.totalCoins);
-      }
+    getUserProfile(userId).then(profile => {
+      setTotalCoins(profile.totalCoins);
       setIsLoading(false);
     }).catch(err => {
       console.error("Failed to fetch user profile:", err);
       setIsLoading(false);
     });
-  }, []);
+  }, [userId]);
 
   const addCoins = useCallback((amount: number, description: string) => {
+    if (!userId) return;
+
     const newTransaction: Transaction = {
-      id: (transactions.length + 1).toString(),
+      id: crypto.randomUUID(),
       description,
       coins: amount,
       date: new Date().toISOString().split('T')[0],
@@ -60,11 +66,11 @@ export default function AppShell() {
     setTransactions(prev => [newTransaction, ...prev]);
 
     // Update Firestore
-    updateUserCoins(MOCK_USER_ID, newTotal).catch(err => {
+    updateUserCoins(userId, newTotal).catch(err => {
         console.error("Failed to update coins in Firestore:", err);
         // Optionally revert state on failure
     });
-  }, [totalCoins, transactions]);
+  }, [totalCoins, transactions, userId]);
 
   const navigateTo = (screen: Screen) => {
     if (screen !== activeScreen) {
@@ -91,7 +97,7 @@ export default function AppShell() {
   };
 
   const renderScreen = () => {
-    if (isLoading) {
+    if (isLoading || !userId) {
       return (
         <div className="flex justify-center items-center h-full">
           <p>Loading Your Profile...</p>
@@ -107,7 +113,7 @@ export default function AppShell() {
       case 'offerwall':
         return <OfferwallScreen addCoins={addCoins} />;
       case 'coins':
-        return <CoinsScreen totalCoins={totalCoins} transactions={transactions} addCoins={addCoins} userId={MOCK_USER_ID} />;
+        return <CoinsScreen totalCoins={totalCoins} transactions={transactions} addCoins={addCoins} userId={userId} />;
       case 'settings':
         return <SettingsScreen />;
       default:

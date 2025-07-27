@@ -22,12 +22,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 
-// SIMULATED USER ID - In a real app, this would come from your auth system
-const MOCK_USER_ID = 'user123'; 
-
-export const initPushNotifications = async () => {
+export const initPushNotifications = async (userId: string) => {
   if (!Capacitor.isNativePlatform()) {
     console.log('Push notifications not available on web.');
+    return;
+  }
+  if (!userId) {
+    console.error("Cannot initialize push notifications without a user ID.");
     return;
   }
 
@@ -49,7 +50,7 @@ export const initPushNotifications = async () => {
   PushNotifications.addListener('registration', (token: Token) => {
     console.info('FCM token:', token.value);
     // Save the FCM token to the user's profile in Firestore
-    updateUserProfile(MOCK_USER_ID, { fcmToken: token.value })
+    updateUserProfile(userId, { fcmToken: token.value })
       .then(() => console.log("Successfully saved FCM token to Firestore."))
       .catch(err => console.error("Failed to save FCM token:", err));
   });

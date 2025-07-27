@@ -65,10 +65,11 @@ export const updateUserCoins = async (userId: string, coins: number): Promise<vo
  */
 export const updateUserProfile = async (userId: string, data: Partial<UserProfile>): Promise<void> => {
     const userDocRef = doc(db, "users", userId);
-    await updateDoc(userDocRef, {
+    // Use setDoc with merge:true to create the doc if it doesn't exist, or update it if it does.
+    await setDoc(userDocRef, {
       ...data,
       lastUpdated: serverTimestamp()
-    });
+    }, { merge: true });
 };
 
 

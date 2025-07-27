@@ -304,6 +304,13 @@ export default function CoinsScreen({ totalCoins, transactions, addCoins, userId
               </TableRow>
             </TableHeader>
             <TableBody>
+              {transactions.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={2} className="text-center text-muted-foreground py-8">
+                    No recent activity yet.
+                  </TableCell>
+                </TableRow>
+              )}
               {transactions.map((tx) => (
                 <TableRow key={tx.id}>
                   <TableCell>
