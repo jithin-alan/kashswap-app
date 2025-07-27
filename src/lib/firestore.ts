@@ -1,3 +1,4 @@
+
 import { db } from './firebase';
 import { doc, getDoc, setDoc, updateDoc, collection, addDoc, serverTimestamp } from "firebase/firestore";
 
@@ -35,7 +36,7 @@ export const getUserProfile = async (userId: string): Promise<UserProfile> => {
     // Document doesn't exist, create it with default values
     const newUser: UserProfile = {
       uid: userId,
-      totalCoins: 1000000, // Starting coins
+      totalCoins: 0, // Starting coins
       createdAt: serverTimestamp(),
       lastUpdated: serverTimestamp(),
     };

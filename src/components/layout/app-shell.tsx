@@ -18,12 +18,7 @@ export type Screen = 'room1' | 'room2' | 'offerwall' | 'coins' | 'settings';
 // SIMULATED USER ID - In a real app, this would come from your auth system
 const MOCK_USER_ID = 'user123';
 
-const initialTransactions: Transaction[] = [
-  { id: '1', description: "Survey Completion", coins: 500, date: "2024-07-20", type: "earn" },
-  { id: '2', description: "Video Ad Watched", coins: 100, date: "2024-07-20", type: "earn" },
-  { id: '3', description: "Redeemed Gift Card", coins: -1000, date: "2024-07-19", type: "redeem" },
-  { id: '4', description: "Daily Login Bonus", coins: 50, date: "2024-07-19", type: "earn" },
-];
+const initialTransactions: Transaction[] = [];
 
 export default function AppShell() {
   const [activeScreen, setActiveScreen] = useState<Screen>('offerwall');
