@@ -15,10 +15,12 @@ import { getUserProfile, updateUserCoins } from '@/lib/firestore';
 
 export type Screen = 'room1' | 'room2' | 'offerwall' | 'coins' | 'settings';
 
-// SIMULATED USER ID - In a real app, this would come from your auth system
-const MOCK_USER_ID = 'user123';
-
 const initialTransactions: Transaction[] = [];
+
+// Function to generate a simple unique ID
+const generateUniqueId = () => {
+  return `user_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+};
 
 export default function AppShell() {
   const [activeScreen, setActiveScreen] = useState<Screen>('offerwall');
@@ -26,27 +28,36 @@ export default function AppShell() {
   const [totalCoins, setTotalCoins] = useState(0);
   const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
   const [isLoading, setIsLoading] = useState(true);
+  const [userId, setUserId] = useState<string | null>(null);
 
-  // Fetch initial user data from Firestore
+  // Get or create user ID on component mount
   useEffect(() => {
+    let currentUserId = localStorage.getItem('userId');
+    if (!currentUserId) {
+      currentUserId = generateUniqueId();
+      localStorage.setItem('userId', currentUserId);
+    }
+    setUserId(currentUserId);
+  }, []);
+
+  // Fetch initial user data from Firestore once userId is set
+  useEffect(() => {
+    if (!userId) return; // Don't run if userId is not set yet
+
     initPushNotifications().catch(err => console.error("Error initializing push notifications", err));
     
-    getUserProfile(MOCK_USER_ID).then(profile => {
-      // FOR TESTING: Reset coins to 0 on load if they exist.
-      if (profile.totalCoins > 0) {
-        updateUserCoins(MOCK_USER_ID, 0);
-        setTotalCoins(0);
-      } else {
-        setTotalCoins(profile.totalCoins);
-      }
+    getUserProfile(userId).then(profile => {
+      setTotalCoins(profile.totalCoins);
       setIsLoading(false);
     }).catch(err => {
       console.error("Failed to fetch user profile:", err);
       setIsLoading(false);
     });
-  }, []);
+  }, [userId]); // This effect depends on userId
 
   const addCoins = useCallback((amount: number, description: string) => {
+    if (!userId) return;
+
     const newTransaction: Transaction = {
       id: (transactions.length + 1).toString(),
       description,
@@ -60,11 +71,11 @@ export default function AppShell() {
     setTransactions(prev => [newTransaction, ...prev]);
 
     // Update Firestore
-    updateUserCoins(MOCK_USER_ID, newTotal).catch(err => {
+    updateUserCoins(userId, newTotal).catch(err => {
         console.error("Failed to update coins in Firestore:", err);
         // Optionally revert state on failure
     });
-  }, [totalCoins, transactions]);
+  }, [totalCoins, transactions, userId]);
 
   const navigateTo = (screen: Screen) => {
     if (screen !== activeScreen) {
@@ -91,7 +102,7 @@ export default function AppShell() {
   };
 
   const renderScreen = () => {
-    if (isLoading) {
+    if (isLoading || !userId) {
       return (
         <div className="flex justify-center items-center h-full">
           <p>Loading Your Profile...</p>
@@ -107,7 +118,7 @@ export default function AppShell() {
       case 'offerwall':
         return <OfferwallScreen addCoins={addCoins} />;
       case 'coins':
-        return <CoinsScreen totalCoins={totalCoins} transactions={transactions} addCoins={addCoins} userId={MOCK_USER_ID} />;
+        return <CoinsScreen totalCoins={totalCoins} transactions={transactions} addCoins={addCoins} userId={userId} />;
       case 'settings':
         return <SettingsScreen />;
       default:

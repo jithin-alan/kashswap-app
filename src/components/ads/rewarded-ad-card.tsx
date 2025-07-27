@@ -15,6 +15,7 @@ interface RewardedAdCardProps {
 }
 
 const adUnitId = 'ca-app-pub-2164351463758055/5603368742';
+const REWARD_AMOUNT = 500;
 
 export default function RewardedAdCard({ addCoins }: RewardedAdCardProps) {
   const [isAdLoading, setIsAdLoading] = useState(false);
@@ -93,10 +94,11 @@ export default function RewardedAdCard({ addCoins }: RewardedAdCardProps) {
             }),
             AdMob.addListener(RewardAdPluginEvents.Rewarded, (reward) => {
                 console.log('Reward info:', reward);
-                addCoins(reward.amount, 'Video Ad Watched');
+                // Use the hardcoded reward amount to ensure consistency
+                addCoins(REWARD_AMOUNT, 'Video Ad Watched'); 
                 toast({
                     title: 'Reward Granted!',
-                    description: `You earned ${reward.amount} ${reward.type}!`,
+                    description: `You earned ${REWARD_AMOUNT} coins!`,
                 });
             }),
             AdMob.addListener(RewardAdPluginEvents.Dismissed, () => {
@@ -138,7 +140,7 @@ export default function RewardedAdCard({ addCoins }: RewardedAdCardProps) {
       </CardHeader>
       <CardFooter className="flex justify-between items-center bg-secondary/50 p-4">
         <div className="font-bold text-lg text-reward flex items-center gap-1">
-          <span>+500</span>
+          <span>+{REWARD_AMOUNT}</span>
           <span className="text-sm">coins</span>
         </div>
         <Button 
