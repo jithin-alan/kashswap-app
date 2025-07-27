@@ -44,6 +44,8 @@ export default function CoinsScreen({ totalCoins, transactions, addCoins, userId
   const [isOpen, setIsOpen] = useState(false);
   const [step, setStep] = useState(1);
   const [paymentMethod, setPaymentMethod] = useState<'upi' | 'paypal' | null>(null);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [paymentId, setPaymentId] = useState('');
   const [amount, setAmount] = useState('');
   const [isWithdrawalPending, setIsWithdrawalPending] = useState(false);
@@ -94,38 +96,27 @@ export default function CoinsScreen({ totalCoins, transactions, addCoins, userId
     } else if (step === 2) {
       const withdrawalAmount = parseInt(amount, 10);
       if (isNaN(withdrawalAmount) || withdrawalAmount <= 0) {
-        toast({
-          title: "Invalid Amount",
-          description: "Please enter a valid number of coins to withdraw.",
-          variant: "destructive",
-        });
+        toast({ title: "Invalid Amount", description: "Please enter a valid number of coins to withdraw.", variant: "destructive" });
         return;
       }
       
       if (withdrawalAmount > totalCoins) {
-        toast({
-          title: "Insufficient Balance",
-          description: "You cannot withdraw more coins than you have.",
-          variant: "destructive",
-        });
+        toast({ title: "Insufficient Balance", description: "You cannot withdraw more coins than you have.", variant: "destructive" });
         return;
       }
 
       if (withdrawalAmount < withdrawalThreshold) {
-        toast({
-          title: "Minimum Withdrawal Amount",
-          description: `You must withdraw at least ${withdrawalThreshold.toLocaleString()} coins.`,
-          variant: "destructive",
-        });
+        toast({ title: "Minimum Withdrawal Amount", description: `You must withdraw at least ${withdrawalThreshold.toLocaleString()} coins.`, variant: "destructive" });
+        return;
+      }
+
+      if (name.trim() === '' || email.trim() === '') {
+        toast({ title: "Input Required", description: "Please enter your full name and email.", variant: "destructive" });
         return;
       }
 
       if (!paymentMethod || paymentId.trim() === '') {
-        toast({
-          title: "Input Required",
-          description: `Please enter your ${paymentMethod === 'upi' ? 'UPI ID' : 'PayPal Email'}.`,
-          variant: "destructive",
-        });
+        toast({ title: "Input Required", description: `Please enter your ${paymentMethod === 'upi' ? 'UPI ID' : 'PayPal Email'}.`, variant: "destructive" });
         return;
       }
       
@@ -134,6 +125,8 @@ export default function CoinsScreen({ totalCoins, transactions, addCoins, userId
       try {
         await createWithdrawalRequest({
           userId,
+          name,
+          email,
           amount: withdrawalAmount,
           paymentMethod,
           paymentId,
@@ -150,11 +143,7 @@ export default function CoinsScreen({ totalCoins, transactions, addCoins, userId
         resetDialog();
       } catch (error) {
         console.error("Failed to submit withdrawal request:", error);
-        toast({
-          title: "Request Failed",
-          description: "Could not submit your withdrawal request. Please try again.",
-          variant: "destructive",
-        });
+        toast({ title: "Request Failed", description: "Could not submit your withdrawal request. Please try again.", variant: "destructive" });
       }
     }
   };
@@ -165,6 +154,8 @@ export default function CoinsScreen({ totalCoins, transactions, addCoins, userId
     setTimeout(() => {
       setStep(1);
       setPaymentMethod(null);
+      setName('');
+      setEmail('');
       setPaymentId('');
       setAmount('');
     }, 300);
@@ -224,7 +215,7 @@ export default function CoinsScreen({ totalCoins, transactions, addCoins, userId
                 <DialogDescription className="text-center">
                   {step === 1 
                     ? "Select your preferred payment method." 
-                    : `Enter the amount and your ${paymentMethod === 'upi' ? 'UPI ID' : 'PayPal Email'}.`}
+                    : `Provide your details for the withdrawal.`}
                 </DialogDescription>
               </DialogHeader>
               
@@ -255,14 +246,15 @@ export default function CoinsScreen({ totalCoins, transactions, addCoins, userId
                   <div className="space-y-4">
                     <div>
                       <Label htmlFor="amount">Amount (Coins)</Label>
-                      <Input 
-                        id="amount"
-                        type="number"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        placeholder="e.g., 100000"
-                        className="text-lg h-12"
-                      />
+                      <Input id="amount" type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="e.g., 100000" className="text-lg h-12" />
+                    </div>
+                     <div>
+                      <Label htmlFor="name">Full Name</Label>
+                      <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="John Doe" className="text-lg h-12" />
+                    </div>
+                     <div>
+                      <Label htmlFor="email">Contact Email</Label>
+                      <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your.email@example.com" className="text-lg h-12" />
                     </div>
                     <div>
                       <Label htmlFor="paymentId">

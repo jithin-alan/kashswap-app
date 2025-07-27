@@ -11,6 +11,8 @@ export interface UserProfile {
 
 export interface WithdrawalRequest {
   userId: string;
+  name: string;
+  email: string;
   amount: number;
   paymentMethod: 'upi' | 'paypal';
   paymentId: string;
