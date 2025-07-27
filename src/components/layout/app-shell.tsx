@@ -32,7 +32,13 @@ export default function AppShell() {
     initPushNotifications().catch(err => console.error("Error initializing push notifications", err));
     
     getUserProfile(MOCK_USER_ID).then(profile => {
-      setTotalCoins(profile.totalCoins);
+      // FOR TESTING: Reset coins to 0 on load if they exist.
+      if (profile.totalCoins > 0) {
+        updateUserCoins(MOCK_USER_ID, 0);
+        setTotalCoins(0);
+      } else {
+        setTotalCoins(profile.totalCoins);
+      }
       setIsLoading(false);
     }).catch(err => {
       console.error("Failed to fetch user profile:", err);
