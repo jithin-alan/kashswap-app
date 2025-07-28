@@ -30,7 +30,7 @@ const settingsOptions = [
     label: "Account Deletion",
     action: { type: 'link', value: 'https://stickadmob.blogspot.com/2024/09/data-deletion-request.html' }
   },
-];
+] as const;
 
 export default function SettingsScreen() {
     
