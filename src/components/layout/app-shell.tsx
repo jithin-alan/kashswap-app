@@ -44,7 +44,7 @@ export default function AppShell() {
   useEffect(() => {
     if (!userId) return; // Don't run if userId is not set yet
 
-    initPushNotifications().catch(err => console.error("Error initializing push notifications", err));
+    initPushNotifications(userId).catch(err => console.error("Error initializing push notifications", err));
     
     getUserProfile(userId).then(profile => {
       setTotalCoins(profile.totalCoins);
@@ -137,7 +137,7 @@ export default function AppShell() {
           <div className="flex items-center gap-2">
             {!isSettingsActive && (
               <div className="flex items-center gap-2 rounded-full bg-secondary px-3 py-1">
-                <span className="font-bold text-lg text-reward">{totalCoins.toLocaleString()}</span>
+                <span className="font-bold text-lg text-reward">{typeof totalCoins === 'number' ? totalCoins.toLocaleString() : '0'}</span>
                 <Coins className="h-6 w-6 text-reward" />
               </div>
             )}

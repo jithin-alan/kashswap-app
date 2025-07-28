@@ -170,7 +170,7 @@ export default function CoinsScreen({ totalCoins, transactions, addCoins, userId
         </CardHeader>
         <CardContent>
           <p className="text-6xl font-bold font-headline text-primary">
-            {totalCoins.toLocaleString()}
+            {typeof totalCoins === 'number' ? totalCoins.toLocaleString() : '0'}
           </p>
         </CardContent>
       </Card>
@@ -183,7 +183,7 @@ export default function CoinsScreen({ totalCoins, transactions, addCoins, userId
           <Progress value={levelInfo.progress} className="h-3 [&>div]:bg-progress" />
            {levelInfo.nextLevel ? (
             <p className="text-sm text-muted-foreground mt-2 text-center">
-              You are <span className="font-bold text-foreground">{levelInfo.coinsToNextLevel.toLocaleString()}</span> coins away from Level {levelInfo.nextLevel}!
+              You are <span className="font-bold text-foreground">{typeof levelInfo.coinsToNextLevel === 'number' ? levelInfo.coinsToNextLevel.toLocaleString() : '0'}</span> coins away from Level {levelInfo.nextLevel}!
             </p>
           ) : (
             <p className="text-sm text-muted-foreground mt-2 text-center font-semibold">
