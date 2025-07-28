@@ -3,12 +3,12 @@
 
 import { useEffect, useState } from 'react';
 import { AdMob, RewardAdOptions, RewardAdPluginEvents } from '@capacitor-community/admob';
+import { Capacitor, PluginListenerHandle } from '@capacitor/core';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
-import { Capacitor } from '@capacitor/core';
 
 interface RewardedAdCardProps {
   addCoins: (amount: number, description: string) => void;
@@ -73,52 +73,58 @@ export default function RewardedAdCard({ addCoins }: RewardedAdCardProps) {
       console.log('AdMob not available on web.');
       return;
     }
+    
+    let listenerHandles: PluginListenerHandle[] = [];
 
-    const initialize = async () => {
+    const setupListeners = async () => {
+      try {
         await AdMob.initialize({});
+
+        const newHandles = await Promise.all([
+          AdMob.addListener(RewardAdPluginEvents.Loaded, () => {
+            console.log('Ad loaded successfully.');
+            setIsAdReady(true);
+            setIsAdLoading(false);
+          }),
+          AdMob.addListener(RewardAdPluginEvents.FailedToLoad, (error) => {
+            console.error('Ad failed to load:', error);
+            setIsAdLoading(false);
+            toast({
+              title: 'Ad Failed to Load',
+              description: 'Please try again later.',
+              variant: 'destructive',
+            });
+          }),
+          AdMob.addListener(RewardAdPluginEvents.Rewarded, (reward) => {
+            console.log('Reward info:', reward);
+            // Use the hardcoded reward amount to ensure consistency
+            addCoins(REWARD_AMOUNT, 'Video Ad Watched'); 
+            toast({
+                title: 'Reward Granted!',
+                description: `You earned ${REWARD_AMOUNT} coins!`,
+            });
+          }),
+          AdMob.addListener(RewardAdPluginEvents.Dismissed, () => {
+            console.log('Ad dismissed. Pre-loading next ad.');
+            setIsAdReady(false);
+            loadAd();
+          })
+        ]);
         
-        const listeners = [
-            AdMob.addListener(RewardAdPluginEvents.Loaded, () => {
-                console.log('Ad loaded successfully.');
-                setIsAdReady(true);
-                setIsAdLoading(false);
-            }),
-            AdMob.addListener(RewardAdPluginEvents.FailedToLoad, (error) => {
-                console.error('Ad failed to load:', error);
-                setIsAdLoading(false);
-                toast({
-                    title: 'Ad Failed to Load',
-                    description: 'Please try again later.',
-                    variant: 'destructive',
-                });
-            }),
-            AdMob.addListener(RewardAdPluginEvents.Rewarded, (reward) => {
-                console.log('Reward info:', reward);
-                // Use the hardcoded reward amount to ensure consistency
-                addCoins(REWARD_AMOUNT, 'Video Ad Watched'); 
-                toast({
-                    title: 'Reward Granted!',
-                    description: `You earned ${REWARD_AMOUNT} coins!`,
-                });
-            }),
-            AdMob.addListener(RewardAdPluginEvents.Dismissed, () => {
-                console.log('Ad dismissed. Pre-loading next ad.');
-                setIsAdReady(false);
-                // Pre-load the next ad
-                loadAd();
-            })
-        ];
-        
-        // Initial ad load
+        listenerHandles = newHandles.filter(handle => handle !== null) as PluginListenerHandle[];
         loadAd();
 
-        return () => {
-          listeners.forEach(listener => listener.remove());
-        };
-    }
+      } catch (e) {
+        console.error('Failed to initialize AdMob or add listeners:', e);
+      }
+    };
 
-    initialize();
-  }, []); // Run only once on mount
+    setupListeners();
+
+    return () => {
+      listenerHandles.forEach(handle => handle.remove());
+    };
+  }, []);
 
   return (
     <Card className="overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
